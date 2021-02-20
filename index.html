@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>نماوا</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="./css/main.css">
+
+</head>
+
+<body>
+  <header>
+    <nav>
+      <img id="logo" src="img/logo.png">
+      <h1>
+        نماوا
+      </h1>
+      <a href="genres.html" class="header__genre">لیست ژانر ها</a>
+      <p class="header__search">جستجو</p>
+      <img id="search" src="img/search.svg" />
+    </nav>
+    <h1>250 فیلم برتر IMDB</h1>
+    <p>فیلم هایی که باید حتما ببینید <br /> البته نبینید هم چیزی رو از دست ندادید!!</p>
+  </header>
+
+  <div class="search--container" style="display: none">
+    <div class="search--overlay"></div>
+    <form action="index.html" method="get">
+      <div class="search--input-parent">
+        <input name="q" autocomplete="off" placeholder="نام فیلمی ک دنبالش میگردی ، البته به لاتین" />
+        <img src="img/search-gray.svg">
+      </div>
+    </form>
+  </div>
+
+  <main id="home">
+    <h2 id="list-title">لیست کل فیلم ها</h2>
+    <div class="film--list">
+    </div>
+    <ul class="film--pagination">
+    </ul>
+  </main>
+
+  <footer>
+    <p>Made With <span style="color: red">❤</span> For You</p>
+  </footer>
+
+
+  <script src="./js/axios.js"></script>
+  <script src="./js/main.js"></script>
+  <script>
+    function loadMovies(data) {
+      const container = document.querySelector(".film--list")
+
+      container.innerHTML = data.map(item =>
+        `<div>
+        <p class="film--score">${item.imdb_rating}</p>
+        <img class="film--poster" src="${item.poster}" />
+       <a class="film--name--link" href='/film.html?id=${item.id}'>
+        <p class="film--name">${item.title}</p> 
+        </a>
+        <div class="film--bottom">
+          <p class="film--year">${item.year}</p>
+          <p class="film--country">${item.country}</p>
+        </div>
+      </div>`
+      ).join("")
+    }
+
+    function loadPagination(metadata) {
+      const paginationContainer = document.querySelector(".film--pagination");
+      const count = metadata.page_count;
+      let pages = []
+
+      for (let i = 1; i <= count; i++) {
+        if (Math.abs(i - metadata.current_page) < 5) {
+          pages.push(i)
+        }
+      }
+
+      paginationContainer.innerHTML = pages.map(item =>
+        `<li ><a class="${metadata.current_page == item && 'active'}" href=/?page=${item}>${item}</a></li>`
+      ).join("")
+    }
+
+    const search = new URLSearchParams(window.location.search);
+    const currentPage = search.get("page")
+    const genre = search.get("genre")
+    const q = search.get("q")
+
+    const newSearch = new URLSearchParams();
+    newSearch.append("page", currentPage);
+    if (genre) {
+      axios.get(`http://moviesapi.ir/api/v1/genres/${genre}/movies?${newSearch.toString()}`).then(res => {
+        loadMovies(res.data.data);
+        loadPagination(res.data.metadata);
+      }).catch(err => {
+        console.error(err);
+      })
+    } else {
+      if (q)
+        newSearch.append("q", q);
+      axios.get(`http://moviesapi.ir/api/v1/movies?${newSearch.toString()}`).then(res => {
+        loadMovies(res.data.data);
+        loadPagination(res.data.metadata);
+      }).catch(err => {
+        console.error(err);
+      })
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>نماوا</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="./css/main.css">
+</head>
+
+<body>
+
+    <header id="film-detail">
+        <nav>
+            <a href="index.html"> 
+                <img id="logo" src="img/logo.png">
+            </a>
+            <h1>
+                نماوا
+            </h1>
+            <a href="genres.html" class="header__genre">لیست ژانر ها</a>
+            <p class="header__search">جستجو</p>
+            <img id="search" src="img/search.svg" />
+        </nav>
+        <div class="film-detail--header">
+            <div class="film-detail--cover"></div>
+            <img src="http://moviesapi.ir/images/tt0111161_poster.jpg" class="film-detail--poster" />
+            <div class="film-detail--detail">
+                <h1>نام فیلم</h1>
+                <p>توضیحات فیلم!!</p>
+            </div>
+            <ul class="film-detail--detail__footer">
+                <li>USA</li>
+                <li>1997</li>
+                <li>7.9</li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="search--container" style="display: none">
+        <div class="search--overlay"></div>
+        <form action="index.html" method="get">
+            <div class="search--input-parent">
+                <input name="q" autocomplete="off" placeholder="نام فیلمی ک دنبالش میگردی ، البته به لاتین" />
+                <img src="img/search-gray.svg">
+            </div>
+        </form>
+    </div>
+
+
+    <main id="home">
+        <h2 id="list-tirl">لیست کل فیلم ها</h2>
+        <div class="film-list"></div>
+    </main>
+
+    <footer>
+        <p>Made With <span style="color: red">❤</span> For You</p>
+    </footer>
+
+    <script src="./js/axios.js"></script>
+
+    <script>
+        function loadFilmDetail(data) {
+            const cover = document.querySelector(".film-detail--cover")
+            const poster = document.querySelector(".film-detail--poster")
+            const title = document.querySelector(".film-detail--detail > h1")
+            const desc = document.querySelector(".film-detail--detail > p")
+            const country = document.querySelectorAll(".film-detail--detail__footer > li")[0]
+            const year = document.querySelectorAll(".film-detail--detail__footer > li")[1]
+            const rate = document.querySelectorAll(".film-detail--detail__footer > li")[2]
+
+            cover.style.backgroundImage = `url(${data.images[0]})`
+            poster.src = data.poster
+            title.innerHTML = data.title
+            desc.innerHTML = data.plot
+            country.innerHTML = data.country
+            year.innerHTML = data.year
+            rate.innerHTML = data.imdb_rating
+        }
+
+
+        const search = new URLSearchParams(window.location.search)
+        const filmId = search.get("id")
+        axios.get(`http://moviesapi.ir/api/v1/movies/${filmId}`)
+            .then(res => loadFilmDetail(res.data))
+            .catch(err => console.log(err))
+    </script>
+</body>
+
+</html>

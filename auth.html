@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>نماوا</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="./css/main.css">
+</head>
+
+<body>
+  <header>
+    <nav>
+      <img id="logo" src="img/logo.png">
+      <h1>
+        نماوا
+      </h1>
+      <a href="genres.html" class="header__genre">لیست ژانر ها</a>
+      <p class="header__search">جستجو</p>
+      <img id="search" src="img/search.svg" />
+    </nav>
+    <h1>250 فیلم برتر IMDB</h1>
+    <p>فیلم هایی که باید حتما ببینید <br /> البته نبینید هم چیزی رو از دست ندادید!!</p>
+  </header>
+
+  <div class="search--container" style="display: none">
+    <div class="search--overlay"></div>
+    <form action="index.html" method="get">
+      <div class="search--input-parent">
+        <input name="q" autocomplete="off" placeholder="نام فیلمی ک دنبالش میگردی ، البته به لاتین" />
+        <img src="img/search-gray.svg">
+      </div>
+    </form>
+  </div>
+
+
+
+  <main id="auth">
+    <h2 id="list-title">اطلاعات اکانت شما - <span id="status">وضعیت</span></h2>
+    <div class="tabs">
+      <div class="input-list">
+        <h3>ثبت نام</h3>
+        <input id="email" placeholder="email" autocomplete="off">
+        <input id="name" placeholder="name" autocomplete="off">
+        <input id="password" placeholder="password" type="password" autocomplete="off">
+        <button onclick="submitRegisterForm()">ثبت نام</button>
+      </div>
+      <div class="input-list">
+        <h3>ورود</h3>
+        <input id="emailLogin" placeholder="نام کاربری" autocomplete="off">
+        <input id="passwordLogin" placeholder="password" type="password" autocomplete="off">
+        <button onclick="submitLoginForm()">ورود</button>
+      </div>
+    </div>
+
+    <button id="exit" onclick="exitLogin()">خروج</button>
+
+
+  </main>
+
+  <footer>
+    <p>Made With <span style="color: red">❤</span> For You</p>
+  </footer>
+
+
+  <script src="./js/axios.js"></script>
+  <script src="./js/main.js"></script>
+  <script>
+    function submitRegisterForm() {
+      const name = document.getElementById("name").value
+      const email = document.getElementById("email").value
+      const password = document.getElementById("password").value
+
+      const body = {
+        name,
+        email,
+        password
+      }
+
+      axios.post("http://moviesapi.ir/api/v1/register", body)
+        .then(res => console.log(res))
+        .catch(err => console.log(err))
+    }
+
+    function submitLoginForm() {
+      const emailLogin = document.getElementById("emailLogin").value
+      const passwordLogin = document.getElementById("passwordLogin").value
+
+      const body = {
+        username: emailLogin,
+        password: passwordLogin,
+        grant_type: "password"
+      }
+
+      axios.post("http://moviesapi.ir/oauth/token", body)
+        .then(res => {
+          localStorage.setItem("access_token", res.data.access_token)
+          localStorage.setItem("refresh_token", res.data.refresh_token)
+          document.getElementById("status").innerText = "وضعیت : لاگین شده"
+        })
+        .catch(err => console.log(err))
+    }
+  </script>
+
+  <script>
+    function exitLogin() {
+      localStorage.removeItem('access_token')
+      document.getElementById("status").innerText = "وضعیت : کاربر مهمان"
+    }
+
+    if (localStorage.getItem("access_token")) {
+      document.getElementById("status").innerText = "وضعیت : لاگین شده"
+      0
+      axios.get("http://moviesapi.ir/api/user", {
+          headers: {
+            authorization: "Bearer " + localStorage.getItem("access_token"),
+            accept: "application/json"
+          }
+        }).then(res => console.log(res))
+        .catch(err => {
+          if (err.response.status === 401) {
+            const body = {
+              grant_type: "refresh_token",
+              refresh_token: localStorage.getItem("refresh_token")
+            }
+            axios.post("http://moviesapi.ir/oauth/token", body)
+              .then(res => {
+                localStorage.setItem("access_token", res.data.access_token)
+                localStorage.setItem("refresh_token", res.data.refresh_token)
+              })
+              .catch(err => {
+                exitLogin()
+              })
+          }
+        })
+
+    } else {
+      document.getElementById("status").innerText = "وضعیت : کاربر مهمان"
+    }
+  </script>
+</body>
+
+</html>

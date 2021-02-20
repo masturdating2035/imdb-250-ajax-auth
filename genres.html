@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>ژانرها</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="./css/main.css">
+</head>
+
+<body>
+
+  <header>
+    <nav>
+      <a href="index.html">
+        <img id="logo" src="img/logo.png">
+      </a>
+      <h1>
+        نماوا
+      </h1>
+      <p class="header__genre">لیست ژانر ها</p>
+      <p class="header__search">جستجو</p>
+      <img id="search" src="img/search.svg" />
+    </nav>
+    <h1>250 فیلم برتر IMDB</h1>
+    <p>فیلم هایی که باید حتما ببینید <br /> البته نبینید هم چیزی رو از دست ندادید!!</p>
+  </header>
+
+  <main id="genres">
+    <h1>لیست ژانر ها</h1>
+    <div class="genre-list">
+      <a href="index.html?genre=Crime" class="genre-item">
+        <img src="img/video.svg" />
+        <p>Crime</p>
+      </a>
+      <a href="index.html?genre=Drama" class="genre-item">
+        <img src="img/video.svg" />
+        <p>Drama</p>
+      </a>
+      <a href="index.html?genre=Action" class="genre-item">
+        <img src="img/video.svg" />
+        <p>Action</p>
+      </a>
+    </div>
+  </main>
+
+  <footer>
+    <p>Made With <span style="color: red">❤</span> For You</p>
+  </footer>
+
+
+  <script src="./js/axios.js"></script>
+
+  <script>
+    function loadGenresList(data) {
+      const container = document.querySelector('.genre-list');
+      container.innerHTML = data.map(item => `
+    <a href="index.html?genre=${item.id}&genreTitle=${item.name}" class="genre-item">
+      <img src="img/video.svg"/>
+      <p>${item.name}</p>
+    </a>
+    `).join("")
+    }
+
+    axios.get(`http://moviesapi.ir/api/v1/genres`).then(res => {
+      console.log(res.data);
+      loadGenresList(res.data);
+    }).catch(err => {
+      console.log(err);
+    })
+  </script>
+</body>
+
+</html>
