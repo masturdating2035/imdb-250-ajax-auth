@@ -112,7 +112,7 @@
 
     if (localStorage.getItem("access_token")) {
       document.getElementById("status").innerText = "وضعیت : لاگین شده"
-      0
+      
       axios.get("http://moviesapi.ir/api/user", {
           headers: {
             authorization: "Bearer " + localStorage.getItem("access_token"),
